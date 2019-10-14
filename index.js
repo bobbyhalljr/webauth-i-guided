@@ -1,6 +1,9 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const saltRounds = 10;
+const myPlaintextPassword = 's0/\/\P4$$w0rD';
 
 const db = require('./database/dbConfig.js');
 const Users = require('./users/users-model.js');
@@ -51,6 +54,17 @@ server.get('/api/users', (req, res) => {
     })
     .catch(err => res.send(err));
 });
+
+server.get('/api/hash', (req, res) => {
+  const credentials = req.body;
+  var salt = bcrypt.genSaltSync(saltRounds);
+  // read a password from the Authorization header
+  const hash = bcrypt.hashSync(myPlaintextPassword, salt);
+  // return an object with the password hashed using bcryptjs
+  credentials.password = hash;
+  // { hash: '970(&(:OHKJHIY*HJKH(*^)*&YLKJBLKJGHIUGH(*P' }
+  console.log(hash)
+})
 
 const port = process.env.PORT || 5000;
 server.listen(port, () => console.log(`\n** Running on port ${port} **\n`));
